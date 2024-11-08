@@ -1,42 +1,69 @@
-#root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
+/* CSS Reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Color Variables */
+:root {
+  --background-color: #1C1C1C;
+  --text-color: #FFFFFF;
+  --main-color: #3FF0E1;
+  --supporting-color: #9C88FF;
+  --supporting-color2: #FECF02;
+  --good-color: #51CB21;
+  --bad-color: #C02668;
+  --non-selected-tab-color: #333333;
+  --hover-text-color: #000000;
+  --non-selected-text-color: #B0B0B0;
+}
+
+body, html {
+  height: 100%;
+  font-family: Arial, sans-serif;
+  background-color: var(--background-color); /* Background color */
+  color: var(--text-color); /* Text color */
+}
+
+.App {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+nav ul {
+  list-style-type: none;
+  display: flex;
+  justify-content: space-around;
+  background-color: var(--background-color); /* Background color */
+}
+
+nav ul li {
+  flex: 1;
+  padding: 15px 0;
   text-align: center;
+  cursor: pointer;
+  color: var(--non-selected-text-color); /* Lighter gray for non-selected tabs */
+  background-color: var(--non-selected-tab-color); /* Background color for non-selected tabs */
+  border-top: 2px solid transparent;
+  transition: background-color 0.3s ease, border-top 0.3s ease, color 0.3s ease;
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+nav ul li:hover {
+  background-color: var(--main-color); /* Main color on hover */
+  color: var(--hover-text-color); /* Black text on hover */
 }
 
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+nav ul li.active {
+  background-color: var(--background-color); /* Same as background color */
+  color: var(--text-color); /* White text for active tab */
+  border-top: 2px solid var(--text-color); /* White underline for active tab */
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
-  }
-}
-
-.card {
-  padding: 2em;
-}
-
-.read-the-docs {
-  color: #888;
+.content {
+  flex: 1;
+  padding: 20px;
+  background-color: var(--background-color); /* Background color */
+  color: var(--text-color); /* Text color */
 }
