@@ -7,7 +7,7 @@ function App() {
 
   useEffect(() => {
     const fetchData = async () => {
-      const response = await fetch(`http://localhost:3001/api/${activeTab}`);
+      const response = await fetch(`/data/${activeTab.toLowerCase()}.json`);
       const result = await response.json();
       setData(result);
     };
@@ -19,7 +19,12 @@ function App() {
   }, [activeTab]);
 
   const renderContent = () => {
-    return <div>{data.message || 'Loading...'}</div>;
+    return (
+      <div>
+        <p>{data.message || 'Loading...'}</p>
+        <p>{data.timestamp || ''}</p>
+      </div>
+    );
   };
 
   return (

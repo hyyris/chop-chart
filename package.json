@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "concurrently \"vite\" \"node server.js\"",
+    "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview"
@@ -12,13 +12,9 @@
   "dependencies": {
     "apexcharts": "^3.54.1",
     "aws-amplify": "^6.8.0",
-    "concurrently": "^9.1.0",
-    "cors": "^2.8.5",
-    "express": "^4.21.1",
     "react": "^18.3.1",
     "react-apexcharts": "^1.5.0",
-    "react-dom": "^18.3.1",
-    "ws": "^8.18.0"
+    "react-dom": "^18.3.1"
   },
   "devDependencies": {
     "@aws-amplify/backend": "^1.6.2",
