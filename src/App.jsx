@@ -19,14 +19,14 @@ function App() {
   const getColor = (estimatedWeight) => {
     if (estimatedWeight >= additionalData.target * (1 - additionalData.deviation)
       && estimatedWeight <= additionalData.target * (1 + additionalData.deviation)) {
-        return {borderColor: 'var(--good-color)'};
+        return 'var(--good-color)';
     }
     const isNotAllowed =  
       estimatedWeight < additionalData.minAllowed ||
       estimatedWeight > additionalData.maxAllowed;
     const style = isNotAllowed 
-      ? { borderColor: 'var(--bad-color)' } 
-      : {borderColor: 'var(--okish-color)'};
+      ? 'var(--bad-color)' 
+      : 'var(--okish-color)';
     
     return style;
   }
@@ -113,14 +113,17 @@ function App() {
         <div className="column">
           <div className="column-header">
             <h2>Preproduction</h2>
-            <span>Pre-target weight: {additionalData.rawTarget}g</span>
+            <div className="target-weight">
+              <span style={{color: 'var(--good-color)'}}>{additionalData.rawTarget}g</span>
+              <span>Pre-target weight</span>
+            </div>
           </div>
           <div className="column-content">
             <div>
               {preproductionData.map(item => {
                 const estimatedWeight = item.weight * additionalData.efficiency;
                 return (
-                  <div key={item.id} className="entity-row" style={getColor(estimatedWeight)}>
+                  <div key={item.id} className="entity-row" style={{borderColor: getColor(estimatedWeight)}}>
                     <span>{item.id} | </span>
                     <span>{item.weight}g | </span>
                     <span>est. weight: {Math.round(estimatedWeight)}g</span>
@@ -133,7 +136,10 @@ function App() {
         <div className="column">
           <div className="column-header">
             <h2>Storage {additionalData.date}</h2>
-            <span>avg days in {additionalData.avgStorage}</span>
+            <div className="target-weight">
+              <span>{additionalData.avgStorage}</span>
+              <span>Avg storage days</span>
+            </div>
           </div>
           <div className="column-content">
             <div>
@@ -141,7 +147,7 @@ function App() {
                 const estimatedWeight = item.weight * (1 - (item.currentTimeInStorage || 0) * additionalData.dryingLoss);
                 return (
                 <div key={item.id} className="entity-row" 
-                  style={getColor(estimatedWeight)}>
+                  style={{borderColor: getColor(estimatedWeight)}}>
                   <span>{item.id} | </span>
                   <span>d: {item.currentTimeInStorage || 0} | </span>
                   <span>est. weight: {Math.round(estimatedWeight)}g </span>
@@ -153,12 +159,18 @@ function App() {
         <div className="column">
           <div className="column-header">
             <h2>Packing</h2>
-            <span>avg: {Math.round(additionalData.avgWeight * 10) / 10}g</span>
+            <div className="target-weight">
+              <span>
+                <span style={{color: getColor(additionalData.avgWeight), 'font-size': '1em'}}>{Math.round(additionalData.avgWeight)}</span>
+                <span style={{color: 'white', 'font-size': '0.5em'}}>/{additionalData.target}g</span>
+              </span>
+              <span>avg/target</span>
+            </div>
           </div>
           <div className="column-content">
             <div>
               {packingData.map(item => (
-                <div key={item.id} className="entity-row" style={getColor(item.weight)}>
+                <div key={item.id} className="entity-row" style={{borderColor: getColor(item.weight)}}>
                   <span>{item.id} | </span>
                   <span>weight: {item.weight}g</span>
                 </div>

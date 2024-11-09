@@ -100,6 +100,10 @@ nav ul li.active {
   top: 0;
   z-index: 1;
   margin-bottom: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
 }
 
 .column-content {
@@ -151,7 +155,7 @@ nav ul li.active {
 
 .settings-icon {
   position: fixed;
-  top: 10px;
+  bottom: 10px; /* Move to bottom */
   right: 10px;
   cursor: pointer;
   font-size: 36px; /* Increased font size */
@@ -193,4 +197,24 @@ nav ul li.active {
   color: black;
   text-decoration: none;
   cursor: pointer;
+}
+
+.target-weight {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  margin-left: auto; /* Align to the right */
+}
+
+.target-weight h2 {
+  margin: 0;
+}
+
+.target-weight span:first-child {
+  font-size: 2em; /* h2 size */
+}
+
+.target-weight span:last-child {
+  color: grey;
+  margin-top: 5px;
 }

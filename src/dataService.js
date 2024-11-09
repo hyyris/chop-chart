@@ -28,7 +28,7 @@ export const fetchData = async (status) => {
 };
 
 export const updateDataStatus = () => {
-  if (modifiedData.filter(item => item.status === 'Packing').length === 62) {
+  if (modifiedData.filter(item => item.status === 'Packing').length >= 62) {
     markAllPackingAsDone(modifiedData);
   } else {
     performRandomOperation(modifiedData);
@@ -60,7 +60,7 @@ export const getAdditionalData = async ({
 
   return {
     target: targetWeight,
-    rawTarget: Math.round(targetWeight / efficiency * 1000) / 10,
+    rawTarget: Math.round(targetWeight / efficiency * 100),
     date: currentDate,
     avgWeight: pArray.length ? totalWeight / pArray.length : 0,
     avgStorage: Math.round(storageEntities.length ? (totalStorageTime / storageEntities.length) * 10 : 0) / 10,
