@@ -4,6 +4,9 @@ let originalData = [...data];
 let modifiedData = [];
 let doneData = [];
 let doneID = 1;
+let lastTen = [];
+
+let currentDate = '10/10/24';
 
 export const fetchData = async (status) => {
   return modifiedData
@@ -11,11 +14,11 @@ export const fetchData = async (status) => {
     .map(item => {
       switch (status) {
         case 'Preproduction':
-          return { id: item.id, weight: item.weightPreCooking };
+          return { ...item, weight: item.weightPreCooking };
         case 'Storage':
-          return { id: item.id, weight: item.weightAfterCooking };
+          return { ...item, weight: item.weightAfterCooking };
         case 'Packing':
-          return { id: item.id, weight: item.weightAfterStorage };
+          return { ...item, weight: item.weightAfterStorage };
         default:
           return item;
       }
@@ -31,33 +34,72 @@ export const updateDataStatus = () => {
   console.log('Data status updated');
 };
 
+export const getAdditionalData = async () => {
+  let totalWeight = 0;
+  const pArray = modifiedData.filter(item => item.status === 'Packing');
+  for (let i = 0; pArray.length > i; i++) {
+    totalWeight += pArray[i].weightAfterStorage;
+  }
+  let totalEfficiency = 0;
+  for (let i = 0; lastTen.length > i; i++) {
+    totalEfficiency += lastTen[i].efficiency;
+  }
+  const efficiency = lastTen.length ? totalEfficiency / lastTen.length * 100 : 99;
+
+  return {
+    target: (290 / efficiency * 100),
+    date: currentDate,
+    avgWeight: pArray.length ? totalWeight / pArray.length : 0,
+    efficiency: efficiency / 100,
+    allowed: 9,
+  };
+};
+
 function performRandomOperation(entities) {
   const operations = ['read', 'updatePreproductionToStorage', 'updateStorageToPacking'];
-  const selectedOperation = operations[Math.floor(Math.random() * operations.length)];
+  let selectedOperation = operations[Math.floor(Math.random() * operations.length)];
+  if (selectedOperation === 'updateStorageToPacking') {
+    const storageEntities = entities.filter(e => e.status === 'Storage' && e.dateOutStorage === currentDate);
+    if (storageEntities.length === 0) {
+      selectedOperation = Math.random() < 0.5 ? 'read' : 'updatePreproductionToStorage';
+    }
+  }
+  let entity;
 
   switch (selectedOperation) {
     case 'read':
-      readNewEntity(entities);
+      entity = readNewEntity(entities);
+      currentDate = entity ? entity.dateProduction : currentDate;
       break;
     case 'updatePreproductionToStorage':
-      updateStatus(entities, 'Preproduction', 'Storage');
+      entity = updateStatus(entities, 'Preproduction', 'Storage');
+      currentDate = entity ? entity.dateIntoStorage : currentDate;
       break;
     case 'updateStorageToPacking':
-      updateStatus(entities, 'Storage', 'Packing');
+      entity = updateStatus(entities, 'Storage', 'Packing');
+      currentDate = entity ? entity.dateOutStorage : currentDate;
+      addToLastTen(entity);
       break;
   }
 }
 
 function readNewEntity(entities) {
   const newEntity = originalData
-    .filter(e => e.status === undefined)
-    .sort((a, b) => a.id - b.id)[0];
+    .sort((a, b) => {
+      const dateA = new Date(a.dateProduction);
+      const dateB = new Date(b.dateProduction);
+      if (dateA - dateB !== 0) {
+        return dateA - dateB;
+      }
+      return a.id - b.id;
+    })[0];
 
   if (newEntity) {
     newEntity.status = 'Preproduction';
     entities.push(newEntity);
     originalData = originalData.filter(e => e.id !== newEntity.id);
   }
+  return newEntity;
 }
 
 function updateStatus(entities, fromStatus, toStatus) {
@@ -68,6 +110,7 @@ function updateStatus(entities, fromStatus, toStatus) {
   if (entityToUpdate) {
     entityToUpdate.status = toStatus;
   }
+  return entityToUpdate;
 }
 
 function markAllPackingAsDone(entities) {
@@ -80,4 +123,11 @@ function markAllPackingAsDone(entities) {
   });
   modifiedData = modifiedData.filter(e => e.status !== 'Done');
   doneID++;
+}
+
+function addToLastTen(element, limit = 10) {
+  lastTen.push(element);
+  if (lastTen.length > limit) {
+    lastTen.shift();
+  }
 }
