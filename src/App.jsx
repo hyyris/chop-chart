@@ -1,43 +1,69 @@
 import { useState, useEffect } from 'react';
 import './App.css';
+import { fetchData, updateDataStatus } from './dataService';
 
 function App() {
-  const [activeTab, setActiveTab] = useState('Preproduction');
-  const [data, setData] = useState({});
+  const [preproductionData, setPreproductionData] = useState([]);
+  const [storageData, setStorageData] = useState([]);
+  const [packingData, setPackingData] = useState([]);
 
   useEffect(() => {
-    const fetchData = async () => {
-      const response = await fetch(`/data/${activeTab.toLowerCase()}.json`);
-      const result = await response.json();
-      setData(result);
+    const getData = async () => {
+      const preproduction = await fetchData('Preproduction');
+      preproduction.sort((a, b) => b.id - a.id);
+      setPreproductionData([...preproduction]);
+      setStorageData([...await fetchData('Storage')]);
+      setPackingData([...await fetchData('Packing')]);
     };
 
-    fetchData();
-    const interval = setInterval(fetchData, 3000);
+    getData();
+    const interval = setInterval(() => {
+      updateDataStatus();
+      getData();
+    }, 1000);
 
     return () => clearInterval(interval);
-  }, [activeTab]);
+  }, []);
 
-  const renderContent = () => {
+  const renderContent = (filteredData) => {
     return (
       <div>
-        <p>{data.message || 'Loading...'}</p>
-        <p>{data.timestamp || ''}</p>
+        {filteredData.map(item => (
+          <div key={item.id} className="entity-row">
+            id: {item.id} | weight: {item.weight}g
+          </div>
+        ))}
       </div>
     );
   };
 
   return (
     <div className="App">
-      <nav>
-        <ul>
-          <li className={activeTab === 'Preproduction' ? 'active' : ''} onClick={() => setActiveTab('Preproduction')}>Preproduction</li>
-          <li className={activeTab === 'Storage' ? 'active' : ''} onClick={() => setActiveTab('Storage')}>Storage</li>
-          <li className={activeTab === 'Packing' ? 'active' : ''} onClick={() => setActiveTab('Packing')}>Packing</li>
-        </ul>
-      </nav>
-      <div className="content">
-        {renderContent()}
+      <div className="columns">
+        <div className="column">
+          <div className="column-header">
+            <h2>Preproduction</h2>
+          </div>
+          <div className="column-content">
+            {renderContent(preproductionData)}
+          </div>
+        </div>
+        <div className="column">
+          <div className="column-header">
+            <h2>Storage</h2>
+          </div>
+          <div className="column-content">
+            {renderContent(storageData)}
+          </div>
+        </div>
+        <div className="column">
+          <div className="column-header">
+            <h2>Packing</h2>
+          </div>
+          <div className="column-content">
+            {renderContent(packingData)}
+          </div>
+        </div>
       </div>
     </div>
   );
