@@ -1,5 +1,7 @@
 import data from '../data/data.json';
 
+const TARGET_WEIGHT = 290;
+
 let originalData = [...data];
 let modifiedData = [];
 let doneData = [];
@@ -36,9 +38,11 @@ export const updateDataStatus = () => {
 
 export const getAdditionalData = async () => {
   let totalWeight = 0;
+  let totalStorageTime = 0;
   const pArray = modifiedData.filter(item => item.status === 'Packing');
   for (let i = 0; pArray.length > i; i++) {
     totalWeight += pArray[i].weightAfterStorage;
+    totalStorageTime += pArray[i].timeInStorage;
   }
   let totalEfficiency = 0;
   for (let i = 0; lastTen.length > i; i++) {
@@ -47,11 +51,16 @@ export const getAdditionalData = async () => {
   const efficiency = lastTen.length ? totalEfficiency / lastTen.length * 100 : 99;
 
   return {
-    target: (290 / efficiency * 100),
+    target: TARGET_WEIGHT,
+    rawTarget: Math.round(TARGET_WEIGHT / efficiency * 100) / 10 * 10,
     date: currentDate,
     avgWeight: pArray.length ? totalWeight / pArray.length : 0,
+    avgStorage: Math.round(pArray.length ? totalStorageTime / pArray.length : 0) / 10 * 10,
     efficiency: efficiency / 100,
-    allowed: 9,
+    minAllowed: TARGET_WEIGHT - 9,
+    maxAllowed: TARGET_WEIGHT + 9,
+    deviation: 0.02,
+    dryingLoss: 0.01,
   };
 };
 
@@ -69,16 +78,18 @@ function performRandomOperation(entities) {
   switch (selectedOperation) {
     case 'read':
       entity = readNewEntity(entities);
-      currentDate = entity ? entity.dateProduction : currentDate;
+      updatedCurrentDate(entity ? entity.dateProduction : currentDate);
       break;
     case 'updatePreproductionToStorage':
       entity = updateStatus(entities, 'Preproduction', 'Storage');
-      currentDate = entity ? entity.dateIntoStorage : currentDate;
+      updatedCurrentDate(entity ? entity.dateIntoStorage : currentDate);
       break;
     case 'updateStorageToPacking':
       entity = updateStatus(entities, 'Storage', 'Packing');
-      currentDate = entity ? entity.dateOutStorage : currentDate;
-      addToLastTen(entity);
+      if (entity) {
+        updatedCurrentDate(entity.dateOutStorage);
+        addToLastTen(entity);
+      }
       break;
   }
 }
@@ -125,9 +136,26 @@ function markAllPackingAsDone(entities) {
   doneID++;
 }
 
-function addToLastTen(element, limit = 10) {
+function addToLastTen(element, limit = 15) {
   lastTen.push(element);
   if (lastTen.length > limit) {
     lastTen.shift();
   }
+}
+
+function updatedCurrentDate(date) {
+  if (currentDate !== date) {
+    currentDate = date;
+    modifiedData.forEach(e => {
+      if (e.status === 'Storage') {
+        e.currentTimeInStorage = getDifferenceInDays(e.dateIntoStorage, currentDate);
+      }
+    });
+  }
+}
+
+function getDifferenceInDays(s1, s2) {
+  const date1 = new Date(s1)
+  const date2 = new Date(s2);
+  return Math.round((date2.getTime() - date1.getTime()) / (1000 * 3600 * 24));
 }

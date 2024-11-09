@@ -8,6 +8,21 @@ function App() {
   const [packingData, setPackingData] = useState([]);
   const [additionalData, setAdditionalData] = useState({});
 
+  const getColor = (estimatedWeight) => {
+    if (estimatedWeight >= additionalData.target * (1 - additionalData.deviation)
+      && estimatedWeight <= additionalData.target * (1 + additionalData.deviation)) {
+        return {borderColor: 'var(--good-color)'};
+    }
+    const isNotAllowed =  
+      estimatedWeight < additionalData.minAllowed ||
+      estimatedWeight > additionalData.maxAllowed;
+    const style = isNotAllowed 
+      ? { borderColor: 'var(--bad-color)' } 
+      : {borderColor: 'var(--okish-color)'};
+    
+    return style;
+  }
+
   useEffect(() => {
     const getData = async () => {
       const preproduction = await fetchData('Preproduction');
@@ -23,7 +38,7 @@ function App() {
     const interval = setInterval(() => {
       updateDataStatus();
       getData();
-    }, 1000);
+    }, 100);
 
     return () => clearInterval(interval);
   }, []);
@@ -34,32 +49,40 @@ function App() {
         <div className="column">
           <div className="column-header">
             <h2>Preproduction</h2>
-            <span>Target weight: {Math.round(additionalData.target * 10) / 10}g</span>
+            <span>Pre-target weight: {additionalData.rawTarget}g</span>
           </div>
           <div className="column-content">
             <div>
-              {preproductionData.map(item => (
-                <div key={item.id} className="entity-row">
-                  <span>{item.id} | </span>
-                  <span>{item.weight}g (~{Math.round(item.weight*additionalData.efficiency)}g)</span>
-                </div>
-              ))}
+              {preproductionData.map(item => {
+                const estimatedWeight = item.weight * additionalData.efficiency;
+                return (
+                  <div key={item.id} className="entity-row" style={getColor(estimatedWeight)}>
+                    <span>{item.id} | </span>
+                    <span>{item.weight}g | </span>
+                    <span>est. weight: {Math.round(estimatedWeight)}g</span>
+                  </div>
+                );
+              })}
             </div>
           </div>
         </div>
         <div className="column">
           <div className="column-header">
-            <h2>Storage</h2>
-            <span>{additionalData.date}</span>
+            <h2>Storage {additionalData.date}</h2>
+            <span>avg days in {additionalData.avgStorage}</span>
           </div>
           <div className="column-content">
             <div>
-              {storageData.map(item => (
-                <div key={item.id} className="entity-row">
+              {storageData.map(item => {
+                const estimatedWeight = item.weight * (1 - (item.currentTimeInStorage || 0) * additionalData.dryingLoss);
+                return (
+                <div key={item.id} className="entity-row" 
+                  style={getColor(estimatedWeight)}>
                   <span>{item.id} | </span>
-                  <span>weight: {item.weight}g</span>
-                </div>
-              ))}
+                  <span>d: {item.currentTimeInStorage || 0} | </span>
+                  <span>est. weight: {Math.round(estimatedWeight)}g </span>
+                </div>)
+              })}
             </div>
           </div>
         </div>
@@ -71,7 +94,7 @@ function App() {
           <div className="column-content">
             <div>
               {packingData.map(item => (
-                <div key={item.id} className="entity-row">
+                <div key={item.id} className="entity-row" style={getColor(item.weight)}>
                   <span>{item.id} | </span>
                   <span>weight: {item.weight}g</span>
                 </div>
