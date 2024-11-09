@@ -70,13 +70,19 @@ function App() {
   const handleDryingLossChange = (e) => setDryingLoss(e.target.value);
   const handleSpeedChange = (e) => setSpeed(2.1 - e.target.value); // Reverse the slider values
 
+  const handleOutsideClick = (e) => {
+    if (e.target.className === 'modal') {
+      handleCloseModal();
+    }
+  };
+
   return (
     <div className="App">
       <div className="settings-icon" onClick={handleCogwheelClick} style={{ color: '#ccc' }}>
         <i className="fas fa-cog"></i>
       </div>
       {isModalOpen && (
-        <div className="modal">
+        <div className="modal" onClick={handleOutsideClick}>
           <div className="modal-content" style={{ backgroundColor: '#333', color: '#fff' }}>
             <span className="close" onClick={handleCloseModal}>&times;</span>
             <h2>Settings</h2>
