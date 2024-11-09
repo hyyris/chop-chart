@@ -68,7 +68,7 @@ function App() {
   const handleMaxDeviationChange = (e) => setMaxDeviation(e.target.value);
   const handleAcceptedDeviationChange = (e) => setAcceptedDeviation(e.target.value);
   const handleDryingLossChange = (e) => setDryingLoss(e.target.value);
-  const handleSpeedChange = (e) => setSpeed(e.target.value);
+  const handleSpeedChange = (e) => setSpeed(2.1 - e.target.value); // Reverse the slider values
 
   return (
     <div className="App">
@@ -81,35 +81,34 @@ function App() {
             <span className="close" onClick={handleCloseModal}>&times;</span>
             <h2>Settings</h2>
             <label>
-              Target weight:
-              <br /><input type="number" value={targetWeight} onChange={handleTargetWeightChange} required />g
+              Target weight (g)
+              <br /><input type="number" value={targetWeight} onChange={handleTargetWeightChange} required />
             </label>
             <br />
             <label>
-              Max deviation:
-              <br /><input type="number" value={maxDeviation} onChange={handleMaxDeviationChange} required />%
+              Max deviation (%)
+              <br /><input type="number" value={maxDeviation} onChange={handleMaxDeviationChange} required />
             </label>
             <br />
             <label>
-              Accepted deviation:
-              <br /><input type="number" value={acceptedDeviation} onChange={handleAcceptedDeviationChange} required />%
+              Accepted deviation (%)
+              <br /><input type="number" value={acceptedDeviation} onChange={handleAcceptedDeviationChange} required />
             </label>
             <br />
             <label>
-              Drying loss:
-              <br /><input type="number" value={dryingLoss} onChange={handleDryingLossChange} required />%
+              Drying loss (%)
+              <br /><input type="number" value={dryingLoss} onChange={handleDryingLossChange} required />
             </label>
             <br />
             <label>
-              Throttle:
+              Speed:
               <br />
-              <input type="range" min="0.1" max="2.0" step="0.1" value={speed} onChange={handleSpeedChange} required />
-              <span>{speed}s</span>
+              <input type="range" min="0.1" max="2.0" step="0.1" value={2.1 - speed} onChange={handleSpeedChange} required />
             </label>
           </div>
         </div>
       )}
-      <div className="columns">
+      <div className={`columns ${isModalOpen ? 'dimmed' : ''}`}>
         <div className="column">
           <div className="column-header">
             <h2>Preproduction</h2>
