@@ -104,6 +104,9 @@ nav ul li.active {
   justify-content: space-between;
   align-items: center;
   width: 100%;
+  background-color: var(--background-color); /* Add background color */
+  border-bottom: 1px solid var(--text-color); /* Add thin white line at the bottom */
+  padding-bottom: 5px; /* Add padding between the line and the text */
 }
 
 .column-content {
@@ -139,11 +142,22 @@ nav ul li.active {
 }
 
 .box {
-  padding: 10px;
+  display: flex; /* Make the box a flex container */
+  justify-content: space-between; /* Distribute space between items */
+  padding: 5px 10px; /* Smaller top and bottom padding */
   margin-bottom: 10px;
-  background-color: #f0f0f0;
   border: 1px solid #ccc;
   text-align: center;
+  align-items: center;
+  background-color: transparent; /* Remove background color */
+}
+
+.box .entity-row {
+  margin-right: 10px; /* Add padding between entities */
+}
+
+.box .entity-row:last-child {
+  margin-right: 0; /* Remove padding for the last entity */
 }
 
 .item {
@@ -217,4 +231,8 @@ nav ul li.active {
 .target-weight span:last-child {
   color: grey;
   margin-top: 5px;
+}
+
+.grey-text {
+  color: grey;
 }

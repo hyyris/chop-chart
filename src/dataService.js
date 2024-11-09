@@ -1,7 +1,9 @@
 import data from '../data/data.json';
+import { pairPackings } from './pairPackings';
 
 const TARGET_WEIGHT = 290;
 
+let assigned_target = TARGET_WEIGHT;
 let originalData = [...data];
 let modifiedData = [];
 let doneData = [];
@@ -11,20 +13,31 @@ let latest = [];
 let currentDate = '10/10/24';
 
 export const fetchData = async (status) => {
-  return modifiedData
+  let returnData = modifiedData
     .filter(item => item.status === status)
     .map(item => {
       switch (status) {
         case 'Preproduction':
-          return { ...item, weight: item.weightPreCooking };
+          return { ...item, weight: Math.round(item.weightPreCooking) };
         case 'Storage':
-          return { ...item, weight: item.weightAfterCooking };
+          return { ...item, weight: Math.round(item.weightAfterCooking) };
         case 'Packing':
-          return { ...item, weight: item.weightAfterStorage };
+          return { ...item, weight: Math.round(item.weightAfterStorage) };
         default:
           return item;
       }
     });
+    if (status === 'Packing') {
+      returnData = pairPackings(returnData, assigned_target);
+      
+      // Order the arrays based on the highest combined weightAfterStorage value
+      returnData.sort((a, b) => {
+        const weightA = a.reduce((sum, entity) => sum + entity.weightAfterStorage, 0);
+        const weightB = b.reduce((sum, entity) => sum + entity.weightAfterStorage, 0);
+        return weightB - weightA;
+      });
+    }
+    return returnData;
 };
 
 export const updateDataStatus = () => {
@@ -41,7 +54,7 @@ export const getAdditionalData = async ({
   acceptedDeviation,
   dryingLoss,
 }) => {
-  targetWeight = targetWeight || TARGET_WEIGHT;
+  assigned_target = targetWeight || TARGET_WEIGHT;
   let totalWeight = 0;
   const pArray = modifiedData.filter(item => item.status === 'Packing');
   for (let i = 0; pArray.length > i; i++) {
@@ -57,16 +70,15 @@ export const getAdditionalData = async ({
     totalEfficiency += latest[i].efficiency;
   }
   const efficiency = latest.length ? totalEfficiency / latest.length * 100 : 99;
-
   return {
-    target: targetWeight,
-    rawTarget: Math.round(targetWeight / efficiency * 100),
+    target: assigned_target,
+    rawTarget: Math.round(assigned_target / efficiency * 100),
     date: currentDate,
     avgWeight: pArray.length ? totalWeight / pArray.length : 0,
     avgStorage: Math.round(storageEntities.length ? (totalStorageTime / storageEntities.length) * 10 : 0) / 10,
     efficiency: efficiency / 100,
-    minAllowed: targetWeight - (targetWeight * maxDeviation),
-    maxAllowed: targetWeight + (targetWeight * maxDeviation),
+    minAllowed: assigned_target - (assigned_target * maxDeviation),
+    maxAllowed: assigned_target + (assigned_target * maxDeviation),
     deviation: acceptedDeviation || 0.02,
     dryingLoss: dryingLoss || 0.01,
   };
@@ -104,6 +116,7 @@ function performRandomOperation(entities) {
       break;
     case 'updateStorageToPacking':
       entity = updateStatus(entities, 'Storage', 'Packing');
+      pairPackings();
       if (entity) {
         updatedCurrentDate(entity.dateOutStorage);
         addToLatest(entity);

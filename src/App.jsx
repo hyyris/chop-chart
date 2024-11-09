@@ -11,9 +11,9 @@ function App() {
   
   // Settings
   const [targetWeight, setTargetWeight] = useState(290);
-  const [maxDeviation, setMaxDeviation] = useState(0.03);
-  const [acceptedDeviation, setAcceptedDeviation] = useState(0.02);
-  const [dryingLoss, setDryingLoss] = useState(0.01);
+  const [maxDeviation, setMaxDeviation] = useState(3);
+  const [acceptedDeviation, setAcceptedDeviation] = useState(2);
+  const [dryingLoss, setDryingLoss] = useState(1);
   const [speed, setSpeed] = useState(1.0);
 
   const getColor = (estimatedWeight) => {
@@ -115,7 +115,7 @@ function App() {
             <h2>Preproduction</h2>
             <div className="target-weight">
               <span style={{color: 'var(--good-color)'}}>{additionalData.rawTarget}g</span>
-              <span>Pre-target weight</span>
+              <span>Pre-target weight: </span>
             </div>
           </div>
           <div className="column-content">
@@ -124,9 +124,9 @@ function App() {
                 const estimatedWeight = item.weight * additionalData.efficiency;
                 return (
                   <div key={item.id} className="entity-row" style={{borderColor: getColor(estimatedWeight)}}>
-                    <span>{item.id} | </span>
-                    <span>{item.weight}g | </span>
-                    <span>est. weight: {Math.round(estimatedWeight)}g</span>
+                    <span className="grey-text">{item.id}</span>
+                    <span> | {item.weight}g | </span>
+                    <span>est. {Math.round(estimatedWeight)}g</span>
                   </div>
                 );
               })}
@@ -148,9 +148,9 @@ function App() {
                 return (
                 <div key={item.id} className="entity-row" 
                   style={{borderColor: getColor(estimatedWeight)}}>
-                  <span>{item.id} | </span>
-                  <span>d: {item.currentTimeInStorage || 0} | </span>
-                  <span>est. weight: {Math.round(estimatedWeight)}g </span>
+                  <span className="grey-text">{item.id}</span>
+                  <span> | {item.currentTimeInStorage || 0}d | </span>
+                  <span>est. {Math.round(estimatedWeight)}g </span>
                 </div>)
               })}
             </div>
@@ -169,12 +169,27 @@ function App() {
           </div>
           <div className="column-content">
             <div>
-              {packingData.map(item => (
-                <div key={item.id} className="entity-row" style={{borderColor: getColor(item.weight)}}>
-                  <span>{item.id} | </span>
-                  <span>weight: {item.weight}g</span>
+              {packingData.map((pair, index) => {
+                let weigth = pair[0].weight;
+                weigth += pair[1]?.weight || 0;
+                return (
+                <div key={index} className="box" style={{borderColor: getColor(weigth / pair.length)}}>
+                  <div className="entity-row" style={{borderColor: getColor(pair[0].weight)}}>
+                    <span className="grey-text">{pair[0].id}</span>
+                    <span> | {pair[0].weight}g</span>
+                  </div>
+                  {pair[1] && (
+                    <div className="entity-row" style={{borderColor: getColor(pair[1].weight)}}>
+                      <span className="grey-text">{pair[1].id}</span>
+                      <span> | {pair[1].weight}g</span>
+                    </div>
+                  )}
+                  <span>
+                    <span style={{color: getColor(weigth / pair.length), 'font-size': '1.5em'}}>{Math.round(weigth)}</span>
+                    <span style={{color: 'white', 'font-size': '1.0em'}}>/{2 * additionalData.target}g</span>
+                  </span>
                 </div>
-              ))}
+              )})}
             </div>
           </div>
         </div>
