@@ -7,6 +7,14 @@ function App() {
   const [storageData, setStorageData] = useState([]);
   const [packingData, setPackingData] = useState([]);
   const [additionalData, setAdditionalData] = useState({});
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  
+  // Settings
+  const [targetWeight, setTargetWeight] = useState(290);
+  const [maxDeviation, setMaxDeviation] = useState(0.03);
+  const [acceptedDeviation, setAcceptedDeviation] = useState(0.02);
+  const [dryingLoss, setDryingLoss] = useState(0.01);
+  const [speed, setSpeed] = useState(1.0);
 
   const getColor = (estimatedWeight) => {
     if (estimatedWeight >= additionalData.target * (1 - additionalData.deviation)
@@ -30,7 +38,12 @@ function App() {
       setPreproductionData([...preproduction]);
       setStorageData([...await fetchData('Storage')]);
       setPackingData([...await fetchData('Packing')]);
-      setAdditionalData(await getAdditionalData());
+      setAdditionalData(await getAdditionalData({
+        targetWeight: targetWeight,
+        maxDeviation: maxDeviation / 100,
+        acceptedDeviation: acceptedDeviation / 100,
+        dryingLoss: dryingLoss / 100,
+      }));
       
     };
 
@@ -38,13 +51,64 @@ function App() {
     const interval = setInterval(() => {
       updateDataStatus();
       getData();
-    }, 100);
+    }, speed * 1000);
 
     return () => clearInterval(interval);
-  }, []);
+  }, [speed, targetWeight, maxDeviation, acceptedDeviation, dryingLoss]);
+
+  const handleCogwheelClick = () => {
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+  };
+
+  const handleTargetWeightChange = (e) => setTargetWeight(e.target.value);
+  const handleMaxDeviationChange = (e) => setMaxDeviation(e.target.value);
+  const handleAcceptedDeviationChange = (e) => setAcceptedDeviation(e.target.value);
+  const handleDryingLossChange = (e) => setDryingLoss(e.target.value);
+  const handleSpeedChange = (e) => setSpeed(e.target.value);
 
   return (
     <div className="App">
+      <div className="settings-icon" onClick={handleCogwheelClick} style={{ color: '#ccc' }}>
+        <i className="fas fa-cog"></i>
+      </div>
+      {isModalOpen && (
+        <div className="modal">
+          <div className="modal-content" style={{ backgroundColor: '#333', color: '#fff' }}>
+            <span className="close" onClick={handleCloseModal}>&times;</span>
+            <h2>Settings</h2>
+            <label>
+              Target weight:
+              <br /><input type="number" value={targetWeight} onChange={handleTargetWeightChange} required />g
+            </label>
+            <br />
+            <label>
+              Max deviation:
+              <br /><input type="number" value={maxDeviation} onChange={handleMaxDeviationChange} required />%
+            </label>
+            <br />
+            <label>
+              Accepted deviation:
+              <br /><input type="number" value={acceptedDeviation} onChange={handleAcceptedDeviationChange} required />%
+            </label>
+            <br />
+            <label>
+              Drying loss:
+              <br /><input type="number" value={dryingLoss} onChange={handleDryingLossChange} required />%
+            </label>
+            <br />
+            <label>
+              Throttle:
+              <br />
+              <input type="range" min="0.1" max="2.0" step="0.1" value={speed} onChange={handleSpeedChange} required />
+              <span>{speed}s</span>
+            </label>
+          </div>
+        </div>
+      )}
       <div className="columns">
         <div className="column">
           <div className="column-header">

@@ -6,7 +6,7 @@ let originalData = [...data];
 let modifiedData = [];
 let doneData = [];
 let doneID = 1;
-let lastTen = [];
+let latest = [];
 
 let currentDate = '10/10/24';
 
@@ -33,34 +33,42 @@ export const updateDataStatus = () => {
   } else {
     performRandomOperation(modifiedData);
   }
-  console.log('Data status updated');
 };
 
-export const getAdditionalData = async () => {
+export const getAdditionalData = async ({
+  targetWeight,
+  maxDeviation,
+  acceptedDeviation,
+  dryingLoss,
+}) => {
+  targetWeight = targetWeight || TARGET_WEIGHT;
   let totalWeight = 0;
-  let totalStorageTime = 0;
   const pArray = modifiedData.filter(item => item.status === 'Packing');
   for (let i = 0; pArray.length > i; i++) {
     totalWeight += pArray[i].weightAfterStorage;
-    totalStorageTime += pArray[i].timeInStorage;
+  }
+  let totalStorageTime = 0;
+  const storageEntities = modifiedData.filter(e => e.status === 'Storage');
+  for (let i = 0; storageEntities.length > i; i++) {
+    totalStorageTime += storageEntities[i].currentTimeInStorage || 0;
   }
   let totalEfficiency = 0;
-  for (let i = 0; lastTen.length > i; i++) {
-    totalEfficiency += lastTen[i].efficiency;
+  for (let i = 0; latest.length > i; i++) {
+    totalEfficiency += latest[i].efficiency;
   }
-  const efficiency = lastTen.length ? totalEfficiency / lastTen.length * 100 : 99;
+  const efficiency = latest.length ? totalEfficiency / latest.length * 100 : 99;
 
   return {
-    target: TARGET_WEIGHT,
-    rawTarget: Math.round(TARGET_WEIGHT / efficiency * 100) / 10 * 10,
+    target: targetWeight,
+    rawTarget: Math.round(targetWeight / efficiency * 1000) / 10,
     date: currentDate,
     avgWeight: pArray.length ? totalWeight / pArray.length : 0,
-    avgStorage: Math.round(pArray.length ? totalStorageTime / pArray.length : 0) / 10 * 10,
+    avgStorage: Math.round(storageEntities.length ? (totalStorageTime / storageEntities.length) * 10 : 0) / 10,
     efficiency: efficiency / 100,
-    minAllowed: TARGET_WEIGHT - 9,
-    maxAllowed: TARGET_WEIGHT + 9,
-    deviation: 0.02,
-    dryingLoss: 0.01,
+    minAllowed: targetWeight - (targetWeight * maxDeviation),
+    maxAllowed: targetWeight + (targetWeight * maxDeviation),
+    deviation: acceptedDeviation || 0.02,
+    dryingLoss: dryingLoss || 0.01,
   };
 };
 
@@ -73,22 +81,32 @@ function performRandomOperation(entities) {
       selectedOperation = Math.random() < 0.5 ? 'read' : 'updatePreproductionToStorage';
     }
   }
+  if (selectedOperation === 'read') {
+    const preEntities = entities.filter(e => e.status === 'Preproduction' && e.dateIntoStorage === currentDate);
+    if (preEntities.length > 0) {
+      selectedOperation = 'updatePreproductionToStorage';
+    }
+  }
+  
   let entity;
-
   switch (selectedOperation) {
     case 'read':
       entity = readNewEntity(entities);
-      updatedCurrentDate(entity ? entity.dateProduction : currentDate);
+      if (entity) {
+        updatedCurrentDate(entity.dateProduction);
+      }
       break;
     case 'updatePreproductionToStorage':
       entity = updateStatus(entities, 'Preproduction', 'Storage');
-      updatedCurrentDate(entity ? entity.dateIntoStorage : currentDate);
+      if (entity) {
+        updatedCurrentDate(entity.dateIntoStorage);
+      }
       break;
     case 'updateStorageToPacking':
       entity = updateStatus(entities, 'Storage', 'Packing');
       if (entity) {
         updatedCurrentDate(entity.dateOutStorage);
-        addToLastTen(entity);
+        addToLatest(entity);
       }
       break;
   }
@@ -136,10 +154,10 @@ function markAllPackingAsDone(entities) {
   doneID++;
 }
 
-function addToLastTen(element, limit = 15) {
-  lastTen.push(element);
-  if (lastTen.length > limit) {
-    lastTen.shift();
+function addToLatest(element, limit = 15) {
+  latest.push(element);
+  if (latest.length > limit) {
+    latest.shift();
   }
 }
 
