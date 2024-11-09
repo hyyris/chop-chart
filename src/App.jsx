@@ -148,7 +148,8 @@ function App() {
                 <div key={item.id} className="entity-row" 
                   style={{borderColor: getColor(estimatedWeight)}}>
                   <span className="grey-text">{item.id}</span>
-                  <span> | {item.currentTimeInStorage || 0}d | </span>
+                  <span> | {item.dateIntoStorage} : </span>
+                  <span> {item.currentTimeInStorage || 0}d | </span>
                   <span>est. {Math.round(estimatedWeight)}g </span>
                 </div>)
               })}
@@ -160,8 +161,8 @@ function App() {
             <h2>Packing</h2>
             <div className="target-weight">
               <span>
-                <span style={{color: getColor(additionalData.avgWeight), 'font-size': '1em'}}>{Math.round(additionalData.avgWeight)}</span>
-                <span style={{color: 'white', 'font-size': '0.5em'}}>/{additionalData.target}g</span>
+                <span style={{color: getColor(additionalData.avgWeight), fontSize: '1em'}}>{Math.round(additionalData.avgWeight)}</span>
+                <span style={{color: 'white', fontSize: '0.5em'}}>/{additionalData.target}g</span>
               </span>
               <span>avg/target</span>
             </div>
@@ -184,8 +185,8 @@ function App() {
                     </div>
                   )}
                   <span>
-                    <span style={{color: getColor(weigth / pair.length), 'font-size': '1.5em'}}>{Math.round(weigth)}</span>
-                    <span style={{color: 'white', 'font-size': '1.0em'}}>/{2 * additionalData.target}g</span>
+                    <span style={{color: getColor(weigth / pair.length), fontSize: '1.5em'}}>{Math.round(weigth)}</span>
+                    <span style={{color: 'white', fontSize: '1.0em'}}>/{2 * additionalData.target}g</span>
                   </span>
                 </div>
               )})}

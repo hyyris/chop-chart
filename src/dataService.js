@@ -27,17 +27,17 @@ export const fetchData = async (status) => {
           return item;
       }
     });
-    if (status === 'Packing') {
-      returnData = pairPackings(returnData, assigned_target);
-      
-      // Order the arrays based on the highest combined weightAfterStorage value
-      returnData.sort((a, b) => {
-        const weightA = a.reduce((sum, entity) => sum + entity.weightAfterStorage, 0);
-        const weightB = b.reduce((sum, entity) => sum + entity.weightAfterStorage, 0);
-        return weightB - weightA;
-      });
-    }
-    return returnData;
+  if (status === 'Packing') {
+    returnData = pairPackings(returnData, assigned_target);
+    
+    // Order the arrays based on the highest combined weightAfterStorage value
+    returnData.sort((a, b) => {
+      const weightA = a.reduce((sum, entity) => sum + entity.weightAfterStorage, 0);
+      const weightB = b.reduce((sum, entity) => sum + entity.weightAfterStorage, 0);
+      return weightB - weightA;
+    });
+  }
+  return returnData;
 };
 
 export const updateDataStatus = () => {
