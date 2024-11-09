@@ -82,7 +82,7 @@ nav ul li.active {
 
 .column {
   flex: 1;
-  margin: 0 10px;
+  margin: 0 5px;
   padding: 10px;
   border: 1px solid #ccc;
   border-radius: 4px;
@@ -90,9 +90,20 @@ nav ul li.active {
   display: flex;
   flex-direction: column;
   align-items: flex-start; /* Align items to the top */
-  background-color: var(--background-color); /* Ensure background color is set */
   width: 30%;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.column:first-child {
+  background: linear-gradient(to bottom right, var(--background-color) 50%, rgba(62, 182, 81, 0.15) 100%); /* First column gradient */
+}
+
+.column:nth-child(2) {
+  background: linear-gradient(to bottom right, var(--background-color) 50%, rgba(234, 215, 39, 0.15) 100%); /* Second column gradient */
+}
+
+.column:last-child {
+  background: linear-gradient(to bottom right, var(--background-color) 50%, rgba(244, 97, 85, 0.15) 100%); /* Last column gradient */
 }
 
 .column-header {
@@ -104,7 +115,7 @@ nav ul li.active {
   justify-content: space-between;
   align-items: center;
   width: 100%;
-  background-color: var(--background-color); /* Add background color */
+  background-color: var(--background-color); /* Fix the background color */
   border-bottom: 1px solid var(--text-color); /* Add thin white line at the bottom */
   padding-bottom: 5px; /* Add padding between the line and the text */
 }
@@ -113,7 +124,9 @@ nav ul li.active {
   flex-grow: 1;
   display: flex;
   flex-direction: column; /* Default to normal column direction */
-  /* ...existing styles... */
+  width: 100%; /* Ensure column-content fills the entire width of the column */
+  text-align: center;
+  
 }
 
 /* Specific styles for Preproduction column */
@@ -143,10 +156,15 @@ nav ul li.active {
 
 .box {
   display: flex; /* Make the box a flex container */
-  justify-content: space-between; /* Distribute space between items */
-  padding: 5px 10px; /* Smaller top and bottom padding */
+  justify-content: space-between; /* Distribute space between i
+  tems */
+  padding: 0px 5px;
   margin-bottom: 10px;
   border: 1px solid #ccc;
+  border-top: 0px;
+  border-bottom: 0px;
+  border-left: 0px;
+  border-right: 0px;
   text-align: center;
   align-items: center;
   background-color: transparent; /* Remove background color */
