@@ -5,6 +5,7 @@ const TARGET_WEIGHT = 290;
 
 let assigned_target = TARGET_WEIGHT;
 let originalData = [...data];
+// let originalData = data.slice(data.length / 2, data.length);
 let modifiedData = [];
 let doneData = [];
 let doneID = 1;
@@ -87,8 +88,8 @@ export const getAdditionalData = async ({
 function performRandomOperation(entities) {
   const operations = ['read', 'updatePreproductionToStorage', 'updateStorageToPacking'];
   let selectedOperation = operations[Math.floor(Math.random() * operations.length)];
+  const storageEntities = entities.filter(e => e.status === 'Storage' && e.dateOutStorage === currentDate);
   if (selectedOperation === 'updateStorageToPacking') {
-    const storageEntities = entities.filter(e => e.status === 'Storage' && e.dateOutStorage === currentDate);
     if (storageEntities.length === 0) {
       selectedOperation = Math.random() < 0.5 ? 'read' : 'updatePreproductionToStorage';
     }
@@ -96,7 +97,8 @@ function performRandomOperation(entities) {
   if (selectedOperation === 'read') {
     const preEntities = entities.filter(e => e.status === 'Preproduction' && e.dateIntoStorage === currentDate);
     if (preEntities.length > 0) {
-      selectedOperation = 'updatePreproductionToStorage';
+      selectedOperation = storageEntities.length !== 0
+        ? 'updateStorageToPacking' : 'updatePreproductionToStorage';
     }
   }
   

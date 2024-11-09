@@ -87,22 +87,22 @@ function App() {
             <span className="close" onClick={handleCloseModal}>&times;</span>
             <h2>Settings</h2>
             <label>
-              Target weight (g)
+              Target Weight (g)
               <br /><input type="number" value={targetWeight} onChange={handleTargetWeightChange} required />
             </label>
             <br />
             <label>
-              Max deviation (%)
+              Max Deviation (%)
               <br /><input type="number" value={maxDeviation} onChange={handleMaxDeviationChange} required />
             </label>
             <br />
             <label>
-              Accepted deviation (%)
+              Accepted Deviation (%)
               <br /><input type="number" value={acceptedDeviation} onChange={handleAcceptedDeviationChange} required />
             </label>
             <br />
             <label>
-              Drying loss (%)
+              Drying Loss (%)
               <br /><input type="number" value={dryingLoss} onChange={handleDryingLossChange} required />
             </label>
             <br />
@@ -120,7 +120,7 @@ function App() {
             <h2>Preproduction</h2>
             <div className="target-weight">
               <span style={{color: 'var(--good-color)'}}>{additionalData.rawTarget}g</span>
-              <span>Pre-target weight: </span>
+              <span>Preproduction Target Weight</span>
             </div>
           </div>
           <div className="column-content">
@@ -146,7 +146,7 @@ function App() {
             </div>
             <div className="target-weight">
               <span>{additionalData.avgStorage}</span>
-              <span>Avg storage days</span>
+              <span>Avg Days in Storage</span>
             </div>
             
           </div>
@@ -174,16 +174,16 @@ function App() {
                 <span style={{color: getColor(additionalData.avgWeight), fontSize: '1em'}}>{Math.round(additionalData.avgWeight)}</span>
                 <span style={{color: 'white', fontSize: '0.5em'}}>/{additionalData.target}g</span>
               </span>
-              <span>avg/target</span>
+              <span>Avg / Target</span>
             </div>
           </div>
           <div className="column-content">
             <div>
               {packingData.map((pair, index) => {
-                let weigth = pair[0].weight;
-                weigth += pair[1]?.weight || 0;
+                let weight = pair[0].weight;
+                weight += pair[1]?.weight || 0;
                 return (
-                <div key={index} className="box" style={{borderColor: getColor(weigth / pair.length)}}>
+                <div key={index} className="box" style={{borderColor: getColor(weight / pair.length)}}>
                   <div className="entity-row" style={{borderColor: getColor(pair[0].weight)}}>
                     <span className="grey-text">{pair[0].id}</span>
                     <span> | {pair[0].weight}g</span>
@@ -195,7 +195,7 @@ function App() {
                     </div>
                   )}
                   <span>
-                    <span style={{color: getColor(weigth / 2), fontSize: '1.5em'}}>{Math.round(weigth)}</span>
+                    <span style={{color: getColor(weight / 2), fontSize: '1.5em'}}>{Math.round(weight)}</span>
                     <span style={{color: 'white', fontSize: '1.0em'}}>/{2 * additionalData.target}g</span>
                   </span>
                 </div>
