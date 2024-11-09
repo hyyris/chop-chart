@@ -112,7 +112,18 @@ function performRandomOperation(entities) {
   }
 }
 
+function resetData() {
+  originalData = [...data];
+  modifiedData = [];
+  doneData = [];
+  doneID = 1;
+  latest = [];
+}
+
 function readNewEntity(entities) {
+  if (originalData.length === 0) {
+    resetData();
+  }
   const newEntity = originalData
     .sort((a, b) => {
       const dateA = new Date(a.dateProduction);
