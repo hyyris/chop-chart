@@ -140,11 +140,15 @@ function App() {
         </div>
         <div className="column">
           <div className="column-header">
-            <h2>Storage {additionalData.date}</h2>
+            <div className="storage-header">
+              <h2>Storage</h2>
+              <span>{additionalData.date}</span>
+            </div>
             <div className="target-weight">
               <span>{additionalData.avgStorage}</span>
               <span>Avg storage days</span>
             </div>
+            
           </div>
           <div className="column-content">
             <div>
@@ -191,7 +195,7 @@ function App() {
                     </div>
                   )}
                   <span>
-                    <span style={{color: getColor(weigth / pair.length), fontSize: '1.5em'}}>{Math.round(weigth)}</span>
+                    <span style={{color: getColor(weigth / 2), fontSize: '1.5em'}}>{Math.round(weigth)}</span>
                     <span style={{color: 'white', fontSize: '1.0em'}}>/{2 * additionalData.target}g</span>
                   </span>
                 </div>

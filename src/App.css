@@ -158,12 +158,8 @@ nav ul li.active {
   display: flex; /* Make the box a flex container */
   justify-content: space-between; /* Distribute space between items */
   padding: 0px 5px;
-  margin-bottom: 10px;
-  border: 1px solid #ccc;
-  border-top: 0px;
-  border-bottom: 0px;
-  border-left: 0px;
-  border-right: 0px;
+  margin-bottom: 0px;
+  border: 0px solid #ccc;
   text-align: center;
   align-items: center;
   background-color: transparent; /* Remove background color */
@@ -230,15 +226,16 @@ nav ul li.active {
   cursor: pointer;
 }
 
+.storage-header {
+  display: flex;
+  flex-direction: column;
+}
+
 .target-weight {
   display: flex;
   flex-direction: column;
   align-items: flex-end;
   margin-left: auto; /* Align to the right */
-}
-
-.target-weight h2 {
-  margin: 0;
 }
 
 .target-weight span:first-child {
